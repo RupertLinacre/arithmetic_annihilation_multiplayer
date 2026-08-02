@@ -15,12 +15,11 @@ describe('reference maths question generation', () => {
     expect(mapChallengeToYearLevel('year5', 3)).toBe('year6')
   })
 
-  it('uses the package expression, answer and four-choice format', () => {
+  it('uses the package expression and formatted answer for typed responses', () => {
     const generator = new MathsQuestionGenerator('test-seed')
     const question = generator.createQuestion('year2', 0)
     expect(question.levelLabel).toBe('Year 2')
-    expect(question.choices).toHaveLength(4)
-    expect(question.choices).toContain(question.answer)
+    expect(question.answer.length).toBeGreaterThan(0)
     expect(question.prompt.length).toBeGreaterThan(0)
   })
 

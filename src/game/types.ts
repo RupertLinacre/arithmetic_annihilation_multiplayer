@@ -147,7 +147,6 @@ export type WireMessage =
 export interface MathsQuestion {
   prompt: string
   answer: string
-  choices: string[]
   levelLabel: string
   type: string
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import type { MathsQuestion } from '../game/types'
 import { assetUrl } from '../game/config'
 
@@ -11,14 +11,18 @@ interface Props {
 
 export function MathsQuestionPanel({ title, question, onWrong, onCorrect }: Props) {
   const [wrong, setWrong] = useState(false)
+  const [response, setResponse] = useState('')
 
-  const answer = (choice: string) => {
-    if (wrong && choice !== question.answer) return
-    if (choice === question.answer) {
+  const answer = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const submittedAnswer = response.trim()
+    if (!submittedAnswer || (wrong && submittedAnswer !== question.answer)) return
+    if (submittedAnswer === question.answer) {
       new Audio(assetUrl('audio/pop.mp3')).play().catch(() => undefined)
       onCorrect()
     } else {
       setWrong(true)
+      setResponse('')
       onWrong()
     }
   }
@@ -28,14 +32,22 @@ export function MathsQuestionPanel({ title, question, onWrong, onCorrect }: Prop
       <div className="question-heading">
         <span>{question.levelLabel} challenge</span>
         <strong id="question-title">{title}</strong>
-        <small className={wrong ? 'is-wrong' : ''}>{wrong ? 'Wrong answer — rival Nibble production increased' : 'Choose the correct answer to complete your move'}</small>
+        <small className={wrong ? 'is-wrong' : ''}>{wrong ? 'Wrong answer — rival Nibble production increased. Try again.' : 'Type the correct answer to complete your move'}</small>
       </div>
       <p className="question-prompt">{question.prompt} <span>= ?</span></p>
-      <div className="answer-grid">
-        {question.choices.map((choice) => (
-          <button key={choice} disabled={wrong && choice !== question.answer} onClick={() => answer(choice)}>{choice}</button>
-        ))}
-      </div>
+      <form className="answer-form" onSubmit={answer}>
+        <label className="sr-only" htmlFor="maths-answer">Your answer</label>
+        <input
+          id="maths-answer"
+          autoComplete="off"
+          autoFocus
+          inputMode="text"
+          value={response}
+          onChange={(event) => setResponse(event.target.value)}
+          placeholder="Your answer"
+        />
+        <button type="submit">Submit</button>
+      </form>
     </section>
   )
 }
