@@ -117,6 +117,7 @@ export type GameAction =
   | { kind: 'buildTower'; teamId: TeamId; type: TowerType; col: number; row: number }
   | { kind: 'upgradeTower'; teamId: TeamId; towerId: number }
   | { kind: 'upgradeSpawner'; teamId: TeamId; type: MonsterType }
+  | { kind: 'wrongAnswer'; teamId: TeamId }
   | { kind: 'deliverMonster'; teamId: TeamId; type: MonsterType; lane: number }
 
 export interface ScheduledAction {

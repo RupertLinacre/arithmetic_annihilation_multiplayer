@@ -168,6 +168,7 @@ export class GameEngine {
     if (action.kind === 'buildTower') return this.buildTower(action)
     if (action.kind === 'upgradeTower') return this.upgradeTower(action.teamId, action.towerId)
     if (action.kind === 'upgradeSpawner') return this.upgradeSpawner(action.teamId, action.type)
+    if (action.kind === 'wrongAnswer') return this.penalizeWrongAnswer(action.teamId)
     return this.spawnUnit(action.teamId, action.type, action.lane)
   }
 
@@ -199,6 +200,16 @@ export class GameEngine {
     spawner.level += 1
     if (spawner.level === 1) spawner.progress = .72
     this.addEvent(`${TEAM_META[teamId].name} powered up ${MONSTER_META[type].name} production.`)
+    return true
+  }
+
+  private penalizeWrongAnswer(teamId: TeamId) {
+    const opponentTeam: TeamId = teamId === 'solar' ? 'lunar' : 'solar'
+    const spawner = this.state.spawners.find((candidate) => candidate.teamId === opponentTeam && candidate.type === 'scout')
+    if (!spawner || spawner.level >= MAX_SPAWNER_LEVEL) return false
+    spawner.level += 1
+    if (spawner.level === 1) spawner.progress = .72
+    this.addEvent(`${TEAM_META[opponentTeam].name}'s Nibble production increased to level ${spawner.level}.`)
     return true
   }
 
