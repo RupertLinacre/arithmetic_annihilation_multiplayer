@@ -74,10 +74,10 @@ export class MathsQuestionGenerator {
     for (let attempt = 0; attempt < this.problemTypes.length; attempt += 1) {
       const type = this.problemTypes[this.problemTypeIndex % this.problemTypes.length]
       this.problemTypeIndex += 1
-      const problem = generateProblem({ yearLevel, type, multipleChoice: true, choiceCount: 4 })
+      const problem = generateProblem({ yearLevel, type })
       if (problem.type === type) return problem
     }
-    return generateProblem({ yearLevel, multipleChoice: true, choiceCount: 4 })
+    return generateProblem({ yearLevel })
   }
 
   createQuestion(baseLevel: MathsLevel = DEFAULT_MATHS_LEVEL, challenge = 0): MathsQuestion {
@@ -89,8 +89,7 @@ export class MathsQuestionGenerator {
     this.lastExpression = problem.expression
     return {
       prompt: problem.expression,
-      answer: problem.correctChoice,
-      choices: this.rng.shuffle(problem.choices),
+      answer: problem.formattedAnswer,
       levelLabel: MATHS_LEVELS.find((level) => level.value === yearLevel)?.label ?? yearLevel,
       type: problem.type,
     }
