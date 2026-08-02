@@ -20,17 +20,16 @@ describe('single-player combat balance', () => {
 
   it('accelerates monster production through sixteen levels', () => {
     expect(MAX_SPAWNER_LEVEL).toBe(16)
-    expect(SPAWNER_RATE_MULTIPLIERS.slice(0, 2)).toEqual([1, 1.34])
-    expect(getSpawnerRateMultiplier(3)).toBeGreaterThan(1.68)
-    expect(getSpawnerRateMultiplier(4)).toBeGreaterThan(2.02)
-    expect(getSpawnerRateMultiplier(5)).toBeGreaterThan(2.36)
-    expect(getSpawnerRateMultiplier(16)).toBe(10)
+    expect(SPAWNER_RATE_MULTIPLIERS).toEqual(Array.from({ length: 16 }, (_, index) => index + 1))
+    expect(getSpawnerRateMultiplier(2)).toBe(2)
+    expect(getSpawnerRateMultiplier(3)).toBe(3)
+    expect(getSpawnerRateMultiplier(16)).toBe(16)
     expect(getSpawnerSpawnPeriod('scout', 1)).toBe(8)
-    expect(getSpawnerSpawnPeriod('scout', 2)).toBeCloseTo(8 / 1.34)
-    expect(getSpawnerSpawnPeriod('scout', 16)).toBeCloseTo(.8)
+    expect(getSpawnerSpawnPeriod('scout', 2)).toBe(4)
+    expect(getSpawnerSpawnPeriod('scout', 16)).toBe(.5)
   })
 
-  it('increases monster health by fifteen percent of base health per spawner level', () => {
+  it('increases monster health by twenty-five percent of base health per spawner level', () => {
     expect(getMonsterHealthAtSpawnerLevel('brute', 1)).toBe(180)
     expect(getMonsterHealthAtSpawnerLevel('brute', 2)).toBeCloseTo(225)
     expect(getMonsterHealthAtSpawnerLevel('brute', 5)).toBeCloseTo(360)
