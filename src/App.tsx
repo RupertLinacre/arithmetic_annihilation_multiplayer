@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Peer, { type DataConnection } from 'peerjs'
 import { GameCanvas } from './components/GameCanvas'
-import { MathsModal } from './components/MathsModal'
+import { MathsQuestionPanel } from './components/MathsModal'
 import { GameEngine } from './game/engine'
 import { DEFAULT_MATHS_LEVEL, MATHS_LEVELS, MathsQuestionGenerator } from './game/maths'
 import { getMaxTowerLevel, getTowerUpgradeChallenge, isBaseFootprintCell, MAX_SPAWNER_LEVEL, MONSTER_META, MONSTER_TYPES, TEAM_META, terrainAt, TOWER_META, TOWER_TYPES, WORLD } from './game/config'
@@ -15,11 +15,6 @@ interface PendingQuestion {
   title: string
   question: MathsQuestion
   action: GameAction
-}
-
-interface AnswerStats {
-  correct: number
-  wrong: number
 }
 
 const id = () => crypto.randomUUID()
@@ -52,7 +47,6 @@ export default function App() {
   const [localTeamId, setLocalTeamId] = useState<TeamId>('solar')
   const [selectedTower, setSelectedTower] = useState<TowerType>('bolt')
   const [pendingQuestion, setPendingQuestion] = useState<PendingQuestion | null>(null)
-  const [answerStats, setAnswerStats] = useState<AnswerStats>({ correct: 0, wrong: 0 })
   const [notice, setNotice] = useState('')
 
   const localPlayer = useMemo(() => players.find((player) => player.id === localId), [players, localId])
@@ -211,7 +205,7 @@ export default function App() {
     if (message.kind === 'start' || message.kind === 'rematch') {
       engineRef.current = GameEngine.fromSnapshot(message.snapshot)
       pendingChecksumsRef.current.clear()
-      setAnswerStats({ correct: 0, wrong: 0 })
+      setPendingQuestion(null)
       setSnapshot(message.snapshot)
       setPlayers(message.snapshot.players)
       setLocalTeamId('lunar')
@@ -240,7 +234,7 @@ export default function App() {
     if (playersRef.current.length !== 2) return
     const engine = new GameEngine(playersRef.current)
     engineRef.current = engine
-    setAnswerStats({ correct: 0, wrong: 0 })
+    setPendingQuestion(null)
     const first = engine.snapshot()
     setSnapshot(first)
     setLocalTeamId('solar')
@@ -259,7 +253,7 @@ export default function App() {
     engine.apply({ kind: 'buildTower', teamId: 'lunar', type: 'bolt', col: 23, row: 3 })
     engineRef.current = engine
     playersRef.current = nextPlayers
-    setAnswerStats({ correct: 0, wrong: 0 })
+    setPendingQuestion(null)
     setPlayers(nextPlayers)
     setSnapshot(engine.snapshot())
     setLocalTeamId('solar')
@@ -285,6 +279,10 @@ export default function App() {
 
   const handleGridClick = (col: number, row: number) => {
     if (snapshot.status !== 'playing') return
+    if (pendingQuestion) {
+      flashNotice('Answer the current question to complete your move.')
+      return
+    }
     const onOwnSide = localTeamId === 'solar' ? col < WORLD.cols / 2 : col >= WORLD.cols / 2
     if (!onOwnSide) {
       flashNotice('That half belongs to your opponent.')
@@ -316,6 +314,10 @@ export default function App() {
   }
 
   const chooseSpawner = (type: MonsterType) => {
+    if (pendingQuestion) {
+      flashNotice('Answer the current question to complete your move.')
+      return
+    }
     const spawner = snapshot.spawners.find((item) => item.teamId === localTeamId && item.type === type)!
     if (spawner.level >= MAX_SPAWNER_LEVEL) {
       flashNotice('That generator is already at maximum speed.')
@@ -348,7 +350,7 @@ export default function App() {
     closeNetwork()
     engineRef.current = null
     pendingChecksumsRef.current.clear()
-    setAnswerStats({ correct: 0, wrong: 0 })
+    setPendingQuestion(null)
     setPhase('home')
     setPlayers([])
     setSnapshot(emptySnapshot())
@@ -442,7 +444,19 @@ export default function App() {
       </div>
 
       <footer className="command-deck">
-        <div className="tower-picker">
+        {pendingQuestion ? <MathsQuestionPanel
+          title={pendingQuestion.title}
+          question={pendingQuestion.question}
+          onWrong={() => {
+            dispatchAction({ kind: 'recordAnswer', teamId: localTeamId, correct: false })
+            dispatchAction({ kind: 'wrongAnswer', teamId: localTeamId })
+          }}
+          onCorrect={() => {
+            dispatchAction({ kind: 'recordAnswer', teamId: localTeamId, correct: true })
+            dispatchAction(pendingQuestion.action)
+            setPendingQuestion(null)
+          }}
+        /> : <div className="tower-picker">
           <div className="deck-title"><span>DEFENCE</span><strong>Choose a tower</strong><small>then click your half of the map</small></div>
           {TOWER_TYPES.map((type) => {
             const meta = TOWER_META[type]
@@ -450,27 +464,12 @@ export default function App() {
               <img src={meta.sprite} /><span><strong>{meta.shortName}</strong><small>{['Easy', 'Medium', 'Hard', 'Very hard'][meta.challenge]} maths</small></span>
             </button>
           })}
-        </div>
+        </div>}
         <div className="battle-log"><span>2 PLAYER · LIVE</span><p>{snapshot.events[0] || 'Build towers and send monsters to the rival base.'}</p></div>
       </footer>
 
       {snapshot.teams[localTeamId].comebackBoost > 0 && <div className="rally-banner">RALLY BOOST · Your towers and base are fighting back</div>}
       {notice && <div className="toast">{notice}</div>}
-      {pendingQuestion && <MathsModal
-        title={pendingQuestion.title}
-        question={pendingQuestion.question}
-        correctCount={answerStats.correct}
-        wrongCount={answerStats.wrong}
-        onWrong={() => {
-          setAnswerStats((stats) => ({ ...stats, wrong: stats.wrong + 1 }))
-          dispatchAction({ kind: 'wrongAnswer', teamId: localTeamId })
-        }}
-        onCorrect={() => {
-          setAnswerStats((stats) => ({ ...stats, correct: stats.correct + 1 }))
-          dispatchAction(pendingQuestion.action)
-          setPendingQuestion(null)
-        }}
-      />}
     </main>
   )
 }
@@ -481,6 +480,10 @@ function PlayerHud({ teamId, snapshot, label }: { teamId: TeamId; snapshot: Game
   return <div className={`player-hud ${teamId}`}>
     <div className="player-hud-copy"><span>{label} · {TEAM_META[teamId].sideLabel}</span><strong>{player?.name || TEAM_META[teamId].name}</strong></div>
     <div className="base-health"><div><span style={{ width: `${team.baseHealth}%` }} /></div><strong>{Math.ceil(team.baseHealth)} HP</strong></div>
+    <div className="answer-stats" aria-label={`${team.answerStats.correct} correct and ${team.answerStats.wrong} wrong answers`}>
+      <span className="correct"><strong>{team.answerStats.correct}</strong> ✓</span>
+      <span className="wrong"><strong>{team.answerStats.wrong}</strong> ×</span>
+    </div>
   </div>
 }
 

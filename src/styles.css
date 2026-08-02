@@ -87,14 +87,19 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .host-hint { color: #8c9c92; }.leave-link { color: #899a90; }
 
 .game-shell { min-height: 100vh; padding: 9px 12px 12px; background: radial-gradient(circle at 50% -20%, #24583f, #07150f 57%); }
-.game-header { display: grid; grid-template-columns: 156px minmax(230px, 1fr) 160px minmax(230px, 1fr) 38px; align-items: center; gap: 8px; max-width: 1540px; margin: 0 auto 7px; }
+.game-header { display: grid; grid-template-columns: 156px minmax(285px, 1fr) 160px minmax(285px, 1fr) 38px; align-items: center; gap: 8px; max-width: 1540px; margin: 0 auto 7px; }
 .mini-brand { display: flex; align-items: center; gap: 9px; font: 800 13px/.9 'Chakra Petch'; text-transform: uppercase; }
 .mini-brand > span { width: 38px; height: 38px; border-radius: 7px; font-size: 18px; box-shadow: 3px 3px 0 #c96728; }
-.player-hud { display: grid; grid-template-columns: 1fr minmax(105px, .8fr); align-items: center; gap: 12px; min-height: 52px; border: 1px solid var(--line); padding: 6px 11px; background: rgba(10,27,20,.94); }
+.player-hud { display: grid; grid-template-columns: minmax(80px, 1fr) minmax(105px, .8fr) auto; grid-template-areas: 'copy health answers'; align-items: center; gap: 12px; min-height: 52px; border: 1px solid var(--line); padding: 6px 11px; background: rgba(10,27,20,.94); }
 .player-hud.solar { border-left: 4px solid var(--solar); }.player-hud.lunar { border-right: 4px solid var(--lunar); text-align: right; }
-.player-hud-copy span { display: block; color: #84958a; font-size: 8px; font-weight: 900; letter-spacing: .12em; }.player-hud-copy strong { font-size: 14px; }
+.player-hud.lunar { grid-template-areas: 'answers health copy'; grid-template-columns: auto minmax(105px, .8fr) minmax(80px, 1fr); }
+.player-hud-copy { grid-area: copy; }.player-hud-copy span { display: block; color: #84958a; font-size: 8px; font-weight: 900; letter-spacing: .12em; }.player-hud-copy strong { font-size: 14px; }
+.base-health { grid-area: health; }
 .base-health > div { height: 8px; overflow: hidden; background: #07110d; }.base-health > div span { display: block; height: 100%; background: var(--solar); transition: width .25s; }.player-hud.lunar .base-health > div span { margin-left: auto; background: var(--lunar); }
 .base-health > strong { display: block; margin-top: 3px; color: #a8b7ad; font-size: 9px; }
+.answer-stats { grid-area: answers; display: flex; gap: 4px; }
+.answer-stats span { display: flex; align-items: baseline; gap: 2px; min-width: 30px; border: 1px solid rgba(248,241,214,.1); border-radius: 4px; padding: 4px 5px; color: #829188; background: rgba(255,255,255,.035); font-size: 9px; font-weight: 900; }
+.answer-stats strong { color: var(--ink); font: 800 13px 'Chakra Petch'; }.answer-stats .correct { color: #62df8b; }.answer-stats .wrong { color: #ff7286; }
 .match-clock { text-align: center; }.match-clock::before { content: 'HEAD TO HEAD'; display: block; color: var(--solar); font-size: 8px; font-weight: 900; letter-spacing: .16em; }.match-clock span { display: block; font: 800 21px 'Chakra Petch'; }.match-clock small { display: block; overflow: hidden; color: #728078; font-size: 8px; white-space: nowrap; text-overflow: ellipsis; }
 .exit-button { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 5px; background: rgba(255,255,255,.04); font-size: 20px; cursor: pointer; }
 .arena-layout { display: grid; grid-template-columns: 66px minmax(960px, 1fr) 66px; align-items: stretch; gap: 5px; max-width: 1540px; margin: auto; }
@@ -116,21 +121,20 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .launch-help { margin: 5px 0 1px; color: #75847c; font-size: 6px; line-height: 1.1; text-align: center; }
 
 .command-deck { display: grid; grid-template-columns: minmax(780px, 1fr) 260px; gap: 7px; max-width: 1384px; margin: 6px auto 0; }
-.tower-picker, .battle-log { min-height: 82px; border: 1px solid var(--line); background: rgba(9,26,19,.96); }
+.tower-picker, .maths-question-panel, .battle-log { min-height: 82px; border: 1px solid var(--line); background: rgba(9,26,19,.96); }
 .tower-picker { display: flex; align-items: center; gap: 6px; padding: 5px 7px; }.deck-title { width: 142px; flex: 0 0 142px; padding-left: 7px; }.deck-title span, .battle-log > span { display: block; color: #73827a; font-size: 7px; font-weight: 900; letter-spacing: .14em; }.deck-title strong, .deck-title small { display: block; }.deck-title strong { margin-top: 2px; font-size: 12px; line-height: 1.1; }.deck-title small { margin-top: 2px; color: #85948b; font-size: 8px; }
 .tower-card { display: grid; grid-template-columns: 56px 1fr; align-items: center; min-width: 142px; height: 70px; border: 1px solid rgba(248,241,214,.1); border-radius: 4px; padding: 4px 8px; text-align: left; background: rgba(255,255,255,.035); cursor: pointer; }.tower-card img { width: 52px; height: 52px; object-fit: contain; }.local-solar .tower-card img { transform: scaleX(-1); }.tower-card span strong, .tower-card span small { display: block; }.tower-card span strong { font-size: 12px; }.tower-card span small { color: #7f9087; font-size: 8px; }.tower-card.is-selected { border-color: var(--solar); background: rgba(255,189,62,.1); box-shadow: inset 0 0 0 1px var(--solar); }.local-lunar .tower-card.is-selected { border-color: var(--lunar); background: rgba(126,231,255,.1); box-shadow: inset 0 0 0 1px var(--lunar); }
 .battle-log { display: grid; align-content: center; padding: 10px 14px; }.battle-log p { margin: 4px 0 0; color: #b9c4bc; font-size: 10px; line-height: 1.25; }
 .rally-banner { position: fixed; top: 82px; left: 50%; z-index: 8; transform: translateX(-50%); padding: 7px 15px; border: 1px solid var(--solar); border-radius: 99px; color: #19241a; background: var(--solar); font-size: 10px; font-weight: 900; letter-spacing: .08em; }
 
-.modal-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 30px; background: rgba(3,10,7,.77); backdrop-filter: blur(8px); }
-.maths-modal { position: relative; width: min(500px, 90vw); border: 1px solid rgba(255,189,62,.45); border-radius: 23px; padding: 34px; text-align: center; background: linear-gradient(145deg, #173e2d, #091c14); box-shadow: 0 34px 100px rgba(0,0,0,.55); }
-.maths-modal h2 { margin: 0; font: 700 23px 'Chakra Petch'; }
-.answer-score { display: flex; justify-content: center; gap: 10px; margin-top: 14px; color: #9eafa3; font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }.answer-score span { padding: 5px 9px; border: 1px solid rgba(248,241,214,.12); border-radius: 99px; background: rgba(255,255,255,.04); }.answer-score strong { color: var(--ink); font: 800 15px 'Chakra Petch'; }
-.question-prompt { margin: 25px 0; font: 800 48px 'Chakra Petch'; }.question-prompt span { color: var(--solar); }
-.answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }.answer-grid button { min-height: 58px; border: 1px solid rgba(248,241,214,.18); border-radius: 11px; background: rgba(248,241,214,.07); font: 800 22px 'Chakra Petch'; cursor: pointer; }.answer-grid button:hover { border-color: var(--solar); background: rgba(255,189,62,.13); }.answer-grid button:disabled { cursor: not-allowed; opacity: .3; }
-.answer-feedback { min-height: 20px; margin: 18px 0 0; color: #85968c; font-size: 12px; }.answer-feedback.is-wrong { color: #ff8e9d; }
+.maths-question-panel { display: grid; grid-template-columns: minmax(210px, .9fr) minmax(150px, .65fr) minmax(360px, 1.6fr); align-items: center; gap: 12px; border-color: rgba(255,189,62,.42); padding: 6px 9px 6px 14px; }
+.local-lunar .maths-question-panel { border-color: rgba(126,231,255,.42); }
+.question-heading span, .question-heading strong, .question-heading small { display: block; }.question-heading span { color: #8dd5ae; font-size: 7px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }.question-heading strong { margin-top: 2px; font-size: 12px; line-height: 1.15; }.question-heading small { margin-top: 4px; color: #7f9087; font-size: 8px; line-height: 1.15; }.question-heading small.is-wrong { color: #ff8e9d; }
+.question-prompt { margin: 0; text-align: center; font: 800 28px 'Chakra Petch'; white-space: nowrap; }.question-prompt span { color: var(--solar); }
+.local-lunar .question-prompt span { color: var(--lunar); }
+.answer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }.answer-grid button { min-height: 56px; border: 1px solid rgba(248,241,214,.18); border-radius: 5px; background: rgba(248,241,214,.07); font: 800 18px 'Chakra Petch'; cursor: pointer; }.answer-grid button:hover { border-color: var(--solar); background: rgba(255,189,62,.13); }.local-lunar .answer-grid button:hover { border-color: var(--lunar); background: rgba(126,231,255,.1); }.answer-grid button:disabled { cursor: not-allowed; opacity: .3; }
 .toast { position: fixed; z-index: 30; left: 50%; bottom: 25px; transform: translateX(-50%); padding: 11px 18px; border: 1px solid rgba(248,241,214,.2); border-radius: 99px; color: #f8f1d6; background: #112a20; box-shadow: 0 12px 30px rgba(0,0,0,.35); font-size: 13px; }
 
 @media (max-height: 820px) {
-  .game-header { margin-bottom: 5px; }.monster-launch-button { width: 39px; height: 39px; flex-basis: 39px; }.monster-launch-button img { max-width: 35px; max-height: 35px; }.launch-list { gap: 4px; }.command-deck { margin-top: 5px; }.tower-picker, .battle-log { min-height: 72px; }.tower-card { height: 60px; }.tower-card img { width: 46px; height: 46px; }
+  .game-header { margin-bottom: 5px; }.monster-launch-button { width: 39px; height: 39px; flex-basis: 39px; }.monster-launch-button img { max-width: 35px; max-height: 35px; }.launch-list { gap: 4px; }.command-deck { margin-top: 5px; }.tower-picker, .maths-question-panel, .battle-log { min-height: 72px; }.tower-card { height: 60px; }.tower-card img { width: 46px; height: 46px; }
 }
