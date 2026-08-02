@@ -19,6 +19,10 @@ export interface TeamState {
   baseHealth: number
   maxBaseHealth: number
   comebackBoost: number
+  answerStats: {
+    correct: number
+    wrong: number
+  }
 }
 
 export interface TowerState {
@@ -117,6 +121,7 @@ export type GameAction =
   | { kind: 'buildTower'; teamId: TeamId; type: TowerType; col: number; row: number }
   | { kind: 'upgradeTower'; teamId: TeamId; towerId: number }
   | { kind: 'upgradeSpawner'; teamId: TeamId; type: MonsterType }
+  | { kind: 'recordAnswer'; teamId: TeamId; correct: boolean }
   | { kind: 'wrongAnswer'; teamId: TeamId }
   | { kind: 'deliverMonster'; teamId: TeamId; type: MonsterType; lane: number; level: number }
 

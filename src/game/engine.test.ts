@@ -48,6 +48,16 @@ describe('GameEngine', () => {
     expect(engine.snapshot().spawners.find((spawner) => spawner.teamId === 'lunar' && spawner.type === 'scout')?.level).toBe(2)
   })
 
+  it('records correct and wrong answers for each team', () => {
+    const engine = new GameEngine(players)
+    expect(engine.apply({ kind: 'recordAnswer', teamId: 'solar', correct: true })).toBe(true)
+    expect(engine.apply({ kind: 'recordAnswer', teamId: 'solar', correct: false })).toBe(true)
+    expect(engine.apply({ kind: 'recordAnswer', teamId: 'lunar', correct: true })).toBe(true)
+
+    expect(engine.snapshot().teams.solar.answerStats).toEqual({ correct: 1, wrong: 1 })
+    expect(engine.snapshot().teams.lunar.answerStats).toEqual({ correct: 1, wrong: 0 })
+  })
+
   it('uses sixteen levels for towers and monster generators', () => {
     const engine = new GameEngine(players)
     engine.apply({ kind: 'buildTower', teamId: 'solar', type: 'spray', col: 4, row: 3 })

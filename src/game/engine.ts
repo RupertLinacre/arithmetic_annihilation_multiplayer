@@ -98,8 +98,8 @@ export class GameEngine {
       this.state = {
         status: 'playing', tick: 0, elapsedMs: 0,
         teams: {
-          solar: { id: 'solar', side: 'left', baseHealth: 100, maxBaseHealth: 100, comebackBoost: 0 },
-          lunar: { id: 'lunar', side: 'right', baseHealth: 100, maxBaseHealth: 100, comebackBoost: 0 },
+          solar: { id: 'solar', side: 'left', baseHealth: 100, maxBaseHealth: 100, comebackBoost: 0, answerStats: { correct: 0, wrong: 0 } },
+          lunar: { id: 'lunar', side: 'right', baseHealth: 100, maxBaseHealth: 100, comebackBoost: 0, answerStats: { correct: 0, wrong: 0 } },
         },
         players, towers: [], units: [], spawners, projectiles: [], explosions: [], pendingActions: [],
         events: ['Battle stations! Build towers and awaken your monster generators.'],
@@ -168,8 +168,16 @@ export class GameEngine {
     if (action.kind === 'buildTower') return this.buildTower(action)
     if (action.kind === 'upgradeTower') return this.upgradeTower(action.teamId, action.towerId)
     if (action.kind === 'upgradeSpawner') return this.upgradeSpawner(action.teamId, action.type)
+    if (action.kind === 'recordAnswer') return this.recordAnswer(action.teamId, action.correct)
     if (action.kind === 'wrongAnswer') return this.penalizeWrongAnswer(action.teamId)
     return this.spawnUnit(action)
+  }
+
+  private recordAnswer(teamId: TeamId, correct: boolean) {
+    const stats = this.state.teams[teamId].answerStats
+    if (correct) stats.correct += 1
+    else stats.wrong += 1
+    return true
   }
 
   private buildTower(action: Extract<GameAction, { kind: 'buildTower' }>) {
@@ -478,7 +486,7 @@ export class GameEngine {
   private makeChecksum() {
     const data = {
       tick: this.state.tick, status: this.state.status, winner: this.state.winner,
-      teams: Object.values(this.state.teams).map((team) => [team.id, stableNumber(team.baseHealth), stableNumber(team.comebackBoost)]),
+      teams: Object.values(this.state.teams).map((team) => [team.id, stableNumber(team.baseHealth), stableNumber(team.comebackBoost), team.answerStats.correct, team.answerStats.wrong]),
       towers: this.state.towers.map((tower) => [tower.id, tower.teamId, tower.type, tower.level, tower.col, tower.row, stableNumber(tower.cooldownMs)]),
       units: this.state.units.map((unit) => [unit.id, unit.teamId, unit.type, stableNumber(unit.x), stableNumber(unit.y), stableNumber(unit.vx), stableNumber(unit.vy), stableNumber(unit.health), unit.isStuck]),
       spawners: this.state.spawners.map((spawner) => [spawner.teamId, spawner.type, spawner.level, stableNumber(spawner.progress), spawner.spawnCount]),
