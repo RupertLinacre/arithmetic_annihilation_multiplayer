@@ -1,5 +1,5 @@
 import {
-  BALANCE_RULES, baseCell, cellCentre, cellHeight, cellWidth, getSpawnerSpawnPeriod, MAX_SPAWNER_LEVEL, getMaxTowerLevel, getTowerStats, isBaseFootprintCell,
+  BALANCE_RULES, baseCell, cellCentre, cellHeight, cellWidth, getMonsterHealthAtSpawnerLevel, getSpawnerSpawnPeriod, MAX_SPAWNER_LEVEL, getMaxTowerLevel, getTowerStats, isBaseFootprintCell,
   isCellOnTeamSide, MONSTER_META, MONSTER_TYPES, TEAM_META, terrainAt, TOWER_META, WORLD,
 } from './config'
 import {
@@ -169,7 +169,7 @@ export class GameEngine {
     if (action.kind === 'upgradeTower') return this.upgradeTower(action.teamId, action.towerId)
     if (action.kind === 'upgradeSpawner') return this.upgradeSpawner(action.teamId, action.type)
     if (action.kind === 'wrongAnswer') return this.penalizeWrongAnswer(action.teamId)
-    return this.spawnUnit(action.teamId, action.type, action.lane)
+    return this.spawnUnit(action)
   }
 
   private buildTower(action: Extract<GameAction, { kind: 'buildTower' }>) {
@@ -223,18 +223,19 @@ export class GameEngine {
       const typeOffset = MONSTER_TYPES.indexOf(spawner.type)
       const lane = (spawner.spawnCount + typeOffset) % WORLD.laneY.length
       spawner.spawnCount += 1
-      this.monsterDeliveries.push({ kind: 'deliverMonster', teamId: spawner.teamId, type: spawner.type, lane })
+      this.monsterDeliveries.push({ kind: 'deliverMonster', teamId: spawner.teamId, type: spawner.type, lane, level: spawner.level })
     }
   }
 
-  private spawnUnit(teamId: TeamId, type: MonsterType, lane: number) {
+  private spawnUnit(action: Extract<GameAction, { kind: 'deliverMonster' }>) {
+    const { teamId, type, lane, level } = action
     if (lane < 0 || lane >= WORLD.laneY.length) return false
-    const meta = MONSTER_META[type]
+    const health = getMonsterHealthAtSpawnerLevel(type, level)
     const row = [1, 3, 5, 7, 9][lane]
     const point = cellCentre(teamId === 'solar' ? 0 : WORLD.cols - 1, row)
     this.state.units.push({
       id: this.nextId++, teamId, type, lane, x: point.x, y: point.y, vx: 0, vy: 0,
-      health: meta.health, maxHealth: meta.health, radius: meta.radius, hurtFlashMs: 0, lastProgressDistance: Number.POSITIVE_INFINITY,
+      health, maxHealth: health, radius: MONSTER_META[type].radius, hurtFlashMs: 0, lastProgressDistance: Number.POSITIVE_INFINITY,
       stalledSeconds: 0, panicSecondsRemaining: 0, panicStartDistance: Number.POSITIVE_INFINITY, isStuck: false,
     })
     return true
