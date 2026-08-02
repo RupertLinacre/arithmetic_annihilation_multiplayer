@@ -25,6 +25,8 @@ function lerpColour(a: number, b: number, t: number) {
   return red << 16 | green << 8 | blue
 }
 
+const invertColour = (value: number) => value ^ 0xffffff
+
 export class CanvasProjectileEffects {
   private particles: Particle[] = []
   private accumulators = new Map<number, number>()
@@ -123,23 +125,20 @@ export class CanvasProjectileEffects {
   }
 
   render(ctx: CanvasRenderingContext2D, localTeamId: TeamId) {
-    this.renderTeam(ctx, localTeamId)
-
+    this.renderTeam(ctx, localTeamId, false)
     const opposingTeamId: TeamId = localTeamId === 'solar' ? 'lunar' : 'solar'
-    ctx.save()
-    ctx.filter = 'invert(1)'
-    this.renderTeam(ctx, opposingTeamId)
-    ctx.restore()
+    this.renderTeam(ctx, opposingTeamId, true)
   }
 
-  private renderTeam(ctx: CanvasRenderingContext2D, teamId: TeamId) {
+  private renderTeam(ctx: CanvasRenderingContext2D, teamId: TeamId, inverted: boolean) {
     for (const particle of this.particles) {
       if (particle.teamId !== teamId) continue
       const t = particle.ageMs / particle.lifeMs
       const size = lerp(particle.startSize, particle.endSize, t)
       const alpha = lerp(particle.startAlpha, particle.endAlpha, t)
       if (size <= .05 || alpha <= .01) continue
-      const fill = lerpColour(particle.startColor, particle.endColor, t)
+      const baseFill = lerpColour(particle.startColor, particle.endColor, t)
+      const fill = inverted ? invertColour(baseFill) : baseFill
       if (particle.glow) { ctx.fillStyle = colour(fill, alpha * .28); ctx.beginPath(); ctx.arc(particle.x, particle.y, size * 1.9, 0, Math.PI * 2); ctx.fill() }
       ctx.fillStyle = colour(fill, alpha); ctx.beginPath(); ctx.arc(particle.x, particle.y, size, 0, Math.PI * 2); ctx.fill()
     }
