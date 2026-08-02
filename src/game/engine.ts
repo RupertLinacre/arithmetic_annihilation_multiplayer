@@ -1,5 +1,5 @@
 import {
-  BALANCE_RULES, baseCell, cellCentre, cellHeight, cellWidth, getMaxTowerLevel, getTowerStats, isBaseFootprintCell,
+  BALANCE_RULES, baseCell, cellCentre, cellHeight, cellWidth, getSpawnerSpawnPeriod, MAX_SPAWNER_LEVEL, getMaxTowerLevel, getTowerStats, isBaseFootprintCell,
   isCellOnTeamSide, MONSTER_META, MONSTER_TYPES, TEAM_META, terrainAt, TOWER_META, WORLD,
 } from './config'
 import {
@@ -195,7 +195,7 @@ export class GameEngine {
 
   private upgradeSpawner(teamId: TeamId, type: MonsterType) {
     const spawner = this.state.spawners.find((candidate) => candidate.teamId === teamId && candidate.type === type)
-    if (!spawner || spawner.level >= 5) return false
+    if (!spawner || spawner.level >= MAX_SPAWNER_LEVEL) return false
     spawner.level += 1
     if (spawner.level === 1) spawner.progress = .72
     this.addEvent(`${TEAM_META[teamId].name} powered up ${MONSTER_META[type].name} production.`)
@@ -205,7 +205,7 @@ export class GameEngine {
   private updateSpawners(dt: number) {
     for (const spawner of this.state.spawners) {
       if (spawner.level === 0) continue
-      const period = MONSTER_META[spawner.type].spawnSeconds / (1 + (spawner.level - 1) * .34)
+      const period = getSpawnerSpawnPeriod(spawner.type, spawner.level)
       spawner.progress += dt / period
       if (spawner.progress < 1) continue
       spawner.progress %= 1

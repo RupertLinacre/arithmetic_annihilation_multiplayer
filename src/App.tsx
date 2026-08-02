@@ -4,7 +4,7 @@ import { GameCanvas } from './components/GameCanvas'
 import { MathsModal } from './components/MathsModal'
 import { GameEngine } from './game/engine'
 import { DEFAULT_MATHS_LEVEL, MATHS_LEVELS, MathsQuestionGenerator } from './game/maths'
-import { getMaxTowerLevel, getTowerUpgradeChallenge, isBaseFootprintCell, MONSTER_META, MONSTER_TYPES, TEAM_META, terrainAt, TOWER_META, TOWER_TYPES, WORLD } from './game/config'
+import { getMaxTowerLevel, getTowerUpgradeChallenge, isBaseFootprintCell, MAX_SPAWNER_LEVEL, MONSTER_META, MONSTER_TYPES, TEAM_META, terrainAt, TOWER_META, TOWER_TYPES, WORLD } from './game/config'
 import type { GameAction, GameSnapshot, MathsLevel, MathsQuestion, MonsterType, PlayerProfile, ScheduledAction, TeamId, TowerType, WireMessage } from './game/types'
 import './styles.css'
 
@@ -308,7 +308,7 @@ export default function App() {
 
   const chooseSpawner = (type: MonsterType) => {
     const spawner = snapshot.spawners.find((item) => item.teamId === localTeamId && item.type === type)!
-    if (spawner.level >= 5) {
+    if (spawner.level >= MAX_SPAWNER_LEVEL) {
       flashNotice('That generator is already at maximum speed.')
       return
     }
@@ -484,7 +484,7 @@ function MonsterLaunchRail({ teamId, localTeamId, snapshot, onChoose }: { teamId
 }
 
 function runBotMove(engine: GameEngine, snapshot: GameSnapshot) {
-  const unlocked = snapshot.spawners.filter((item) => item.teamId === 'lunar' && item.level < 5)
+  const unlocked = snapshot.spawners.filter((item) => item.teamId === 'lunar' && item.level < MAX_SPAWNER_LEVEL)
   if (Math.random() < 0.48 && unlocked.length) {
     const target = unlocked[Math.floor(Math.random() * unlocked.length)]
     engine.apply({ kind: 'upgradeSpawner', teamId: 'lunar', type: target.type })
