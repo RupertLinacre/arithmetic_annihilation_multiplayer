@@ -143,4 +143,5 @@ export interface MathsQuestion {
   answer: string
   choices: string[]
   levelLabel: string
+  type: string
 }

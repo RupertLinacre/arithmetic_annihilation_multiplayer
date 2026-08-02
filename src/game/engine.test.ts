@@ -29,7 +29,7 @@ describe('GameEngine', () => {
     expect(state.units.some((unit) => unit.teamId === 'solar' && unit.type === 'scout')).toBe(true)
   })
 
-  it('uses the original sixteen tower levels while generators cap at five', () => {
+  it('uses sixteen levels for towers and monster generators', () => {
     const engine = new GameEngine(players)
     engine.apply({ kind: 'buildTower', teamId: 'solar', type: 'spray', col: 4, row: 3 })
     const towerId = engine.snapshot().towers[0].id
@@ -39,7 +39,7 @@ describe('GameEngine', () => {
     }
     const state = engine.snapshot()
     expect(state.towers[0].level).toBe(16)
-    expect(state.spawners.find((spawner) => spawner.teamId === 'solar' && spawner.type === 'brute')?.level).toBe(5)
+    expect(state.spawners.find((spawner) => spawner.teamId === 'solar' && spawner.type === 'brute')?.level).toBe(16)
   })
 
   it('keeps each three-by-three base footprint inside and unbuildable', () => {

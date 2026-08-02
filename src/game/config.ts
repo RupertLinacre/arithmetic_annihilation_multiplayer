@@ -168,6 +168,27 @@ export const MONSTER_META: Record<MonsterType, {
 export const TOWER_TYPES = Object.keys(TOWER_META) as TowerType[]
 export const MONSTER_TYPES = Object.keys(MONSTER_META) as MonsterType[]
 
+/**
+ * Offensive production deliberately accelerates into the late game. Levels 1
+ * and 2 retain the original rates; levels 3-5 are faster than the original
+ * progression, and levels 6-16 keep adding pressure for the rest of a match.
+ */
+export const SPAWNER_RATE_MULTIPLIERS = [
+  1, 1.34, 2, 2.65, 3.4, 4, 4.6, 5.2,
+  5.8, 6.4, 7, 7.6, 8.2, 8.8, 9.4, 10,
+] as const
+
+export const MAX_SPAWNER_LEVEL = SPAWNER_RATE_MULTIPLIERS.length
+
+export function getSpawnerRateMultiplier(level: number) {
+  const clampedLevel = Math.max(1, Math.min(MAX_SPAWNER_LEVEL, level))
+  return SPAWNER_RATE_MULTIPLIERS[clampedLevel - 1]
+}
+
+export function getSpawnerSpawnPeriod(type: MonsterType, level: number) {
+  return MONSTER_META[type].spawnSeconds / getSpawnerRateMultiplier(level)
+}
+
 export const BALANCE_RULES = {
   // Retained for later opt-in balancing, but disabled so combat is identical to single player.
   enabled: false,
