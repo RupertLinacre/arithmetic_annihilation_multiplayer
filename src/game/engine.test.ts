@@ -29,6 +29,17 @@ describe('GameEngine', () => {
     expect(state.units.some((unit) => unit.teamId === 'solar' && unit.type === 'scout')).toBe(true)
   })
 
+  it('scales delivered monster health using the spawner level', () => {
+    const engine = new GameEngine(players)
+    expect(engine.apply({ kind: 'deliverMonster', teamId: 'solar', type: 'brute', lane: 0, level: 1 })).toBe(true)
+    expect(engine.apply({ kind: 'deliverMonster', teamId: 'solar', type: 'brute', lane: 1, level: 16 })).toBe(true)
+    const units = engine.snapshot().units
+    expect(units[0].health).toBe(180)
+    expect(units[0].maxHealth).toBe(180)
+    expect(units[1].health).toBe(855)
+    expect(units[1].maxHealth).toBe(855)
+  })
+
   it('increases the opponent Nibble production after a wrong answer', () => {
     const engine = new GameEngine(players)
     expect(engine.apply({ kind: 'wrongAnswer', teamId: 'solar' })).toBe(true)

@@ -179,6 +179,7 @@ export const SPAWNER_RATE_MULTIPLIERS = [
 ] as const
 
 export const MAX_SPAWNER_LEVEL = SPAWNER_RATE_MULTIPLIERS.length
+export const MONSTER_HEALTH_INCREASE_PER_SPAWNER_LEVEL = .25
 
 export function getSpawnerRateMultiplier(level: number) {
   const clampedLevel = Math.max(1, Math.min(MAX_SPAWNER_LEVEL, level))
@@ -187,6 +188,12 @@ export function getSpawnerRateMultiplier(level: number) {
 
 export function getSpawnerSpawnPeriod(type: MonsterType, level: number) {
   return MONSTER_META[type].spawnSeconds / getSpawnerRateMultiplier(level)
+}
+
+export function getMonsterHealthAtSpawnerLevel(type: MonsterType, level: number) {
+  const clampedLevel = Math.max(1, Math.min(MAX_SPAWNER_LEVEL, level))
+  const multiplier = 1 + (clampedLevel - 1) * MONSTER_HEALTH_INCREASE_PER_SPAWNER_LEVEL
+  return MONSTER_META[type].health * multiplier
 }
 
 export const BALANCE_RULES = {

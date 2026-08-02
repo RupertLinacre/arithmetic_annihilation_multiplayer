@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BALANCE_RULES, getMaxTowerLevel, getSpawnerRateMultiplier, getSpawnerSpawnPeriod, getTowerStats, getTowerUpgradeChallenge, MAX_SPAWNER_LEVEL, MONSTER_META, SPAWNER_RATE_MULTIPLIERS, TOWER_STATS } from './config'
+import { BALANCE_RULES, getMaxTowerLevel, getMonsterHealthAtSpawnerLevel, getSpawnerRateMultiplier, getSpawnerSpawnPeriod, getTowerStats, getTowerUpgradeChallenge, MAX_SPAWNER_LEVEL, MONSTER_META, SPAWNER_RATE_MULTIPLIERS, TOWER_STATS } from './config'
 
 describe('single-player combat balance', () => {
   it('uses the original monster archetype values', () => {
@@ -28,6 +28,13 @@ describe('single-player combat balance', () => {
     expect(getSpawnerSpawnPeriod('scout', 1)).toBe(8)
     expect(getSpawnerSpawnPeriod('scout', 2)).toBeCloseTo(8 / 1.34)
     expect(getSpawnerSpawnPeriod('scout', 16)).toBeCloseTo(.8)
+  })
+
+  it('increases monster health by fifteen percent of base health per spawner level', () => {
+    expect(getMonsterHealthAtSpawnerLevel('brute', 1)).toBe(180)
+    expect(getMonsterHealthAtSpawnerLevel('brute', 2)).toBeCloseTo(225)
+    expect(getMonsterHealthAtSpawnerLevel('brute', 5)).toBeCloseTo(360)
+    expect(getMonsterHealthAtSpawnerLevel('brute', 16)).toBeCloseTo(855)
   })
 
   it('matches the original maths progression for tower upgrades', () => {
