@@ -17,6 +17,11 @@ interface PendingQuestion {
   action: GameAction
 }
 
+interface AnswerStats {
+  correct: number
+  wrong: number
+}
+
 const id = () => crypto.randomUUID()
 const createInviteCode = () => Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('')
 const emptySnapshot = (): GameSnapshot => new GameEngine([]).snapshot()
@@ -47,6 +52,7 @@ export default function App() {
   const [localTeamId, setLocalTeamId] = useState<TeamId>('solar')
   const [selectedTower, setSelectedTower] = useState<TowerType>('bolt')
   const [pendingQuestion, setPendingQuestion] = useState<PendingQuestion | null>(null)
+  const [answerStats, setAnswerStats] = useState<AnswerStats>({ correct: 0, wrong: 0 })
   const [notice, setNotice] = useState('')
 
   const localPlayer = useMemo(() => players.find((player) => player.id === localId), [players, localId])
@@ -205,6 +211,7 @@ export default function App() {
     if (message.kind === 'start' || message.kind === 'rematch') {
       engineRef.current = GameEngine.fromSnapshot(message.snapshot)
       pendingChecksumsRef.current.clear()
+      setAnswerStats({ correct: 0, wrong: 0 })
       setSnapshot(message.snapshot)
       setPlayers(message.snapshot.players)
       setLocalTeamId('lunar')
@@ -233,6 +240,7 @@ export default function App() {
     if (playersRef.current.length !== 2) return
     const engine = new GameEngine(playersRef.current)
     engineRef.current = engine
+    setAnswerStats({ correct: 0, wrong: 0 })
     const first = engine.snapshot()
     setSnapshot(first)
     setLocalTeamId('solar')
@@ -251,6 +259,7 @@ export default function App() {
     engine.apply({ kind: 'buildTower', teamId: 'lunar', type: 'bolt', col: 23, row: 3 })
     engineRef.current = engine
     playersRef.current = nextPlayers
+    setAnswerStats({ correct: 0, wrong: 0 })
     setPlayers(nextPlayers)
     setSnapshot(engine.snapshot())
     setLocalTeamId('solar')
@@ -339,6 +348,7 @@ export default function App() {
     closeNetwork()
     engineRef.current = null
     pendingChecksumsRef.current.clear()
+    setAnswerStats({ correct: 0, wrong: 0 })
     setPhase('home')
     setPlayers([])
     setSnapshot(emptySnapshot())
@@ -446,7 +456,21 @@ export default function App() {
 
       {snapshot.teams[localTeamId].comebackBoost > 0 && <div className="rally-banner">RALLY BOOST · Your towers and base are fighting back</div>}
       {notice && <div className="toast">{notice}</div>}
-      {pendingQuestion && <MathsModal title={pendingQuestion.title} question={pendingQuestion.question} onCancel={() => setPendingQuestion(null)} onCorrect={() => { dispatchAction(pendingQuestion.action); setPendingQuestion(null) }} />}
+      {pendingQuestion && <MathsModal
+        title={pendingQuestion.title}
+        question={pendingQuestion.question}
+        correctCount={answerStats.correct}
+        wrongCount={answerStats.wrong}
+        onWrong={() => {
+          setAnswerStats((stats) => ({ ...stats, wrong: stats.wrong + 1 }))
+          dispatchAction({ kind: 'wrongAnswer', teamId: localTeamId })
+        }}
+        onCorrect={() => {
+          setAnswerStats((stats) => ({ ...stats, correct: stats.correct + 1 }))
+          dispatchAction(pendingQuestion.action)
+          setPendingQuestion(null)
+        }}
+      />}
     </main>
   )
 }

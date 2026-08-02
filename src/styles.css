@@ -124,9 +124,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 .modal-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 30px; background: rgba(3,10,7,.77); backdrop-filter: blur(8px); }
 .maths-modal { position: relative; width: min(500px, 90vw); border: 1px solid rgba(255,189,62,.45); border-radius: 23px; padding: 34px; text-align: center; background: linear-gradient(145deg, #173e2d, #091c14); box-shadow: 0 34px 100px rgba(0,0,0,.55); }
-.maths-modal h2 { margin: 0; font: 700 23px 'Chakra Petch'; }.modal-close { position: absolute; top: 12px; right: 14px; border: 0; background: none; color: #91a197; font-size: 25px; cursor: pointer; }
+.maths-modal h2 { margin: 0; font: 700 23px 'Chakra Petch'; }
+.answer-score { display: flex; justify-content: center; gap: 10px; margin-top: 14px; color: #9eafa3; font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }.answer-score span { padding: 5px 9px; border: 1px solid rgba(248,241,214,.12); border-radius: 99px; background: rgba(255,255,255,.04); }.answer-score strong { color: var(--ink); font: 800 15px 'Chakra Petch'; }
 .question-prompt { margin: 25px 0; font: 800 48px 'Chakra Petch'; }.question-prompt span { color: var(--solar); }
-.answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }.answer-grid button { min-height: 58px; border: 1px solid rgba(248,241,214,.18); border-radius: 11px; background: rgba(248,241,214,.07); font: 800 22px 'Chakra Petch'; cursor: pointer; }.answer-grid button:hover { border-color: var(--solar); background: rgba(255,189,62,.13); }
+.answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }.answer-grid button { min-height: 58px; border: 1px solid rgba(248,241,214,.18); border-radius: 11px; background: rgba(248,241,214,.07); font: 800 22px 'Chakra Petch'; cursor: pointer; }.answer-grid button:hover { border-color: var(--solar); background: rgba(255,189,62,.13); }.answer-grid button:disabled { cursor: not-allowed; opacity: .3; }
 .answer-feedback { min-height: 20px; margin: 18px 0 0; color: #85968c; font-size: 12px; }.answer-feedback.is-wrong { color: #ff8e9d; }
 .toast { position: fixed; z-index: 30; left: 50%; bottom: 25px; transform: translateX(-50%); padding: 11px 18px; border: 1px solid rgba(248,241,214,.2); border-radius: 99px; color: #f8f1d6; background: #112a20; box-shadow: 0 12px 30px rgba(0,0,0,.35); font-size: 13px; }
 

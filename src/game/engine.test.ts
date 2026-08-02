@@ -29,6 +29,14 @@ describe('GameEngine', () => {
     expect(state.units.some((unit) => unit.teamId === 'solar' && unit.type === 'scout')).toBe(true)
   })
 
+  it('increases the opponent Nibble production after a wrong answer', () => {
+    const engine = new GameEngine(players)
+    expect(engine.apply({ kind: 'wrongAnswer', teamId: 'solar' })).toBe(true)
+    expect(engine.snapshot().spawners.find((spawner) => spawner.teamId === 'lunar' && spawner.type === 'scout')?.level).toBe(1)
+    expect(engine.apply({ kind: 'wrongAnswer', teamId: 'solar' })).toBe(true)
+    expect(engine.snapshot().spawners.find((spawner) => spawner.teamId === 'lunar' && spawner.type === 'scout')?.level).toBe(2)
+  })
+
   it('uses sixteen levels for towers and monster generators', () => {
     const engine = new GameEngine(players)
     engine.apply({ kind: 'buildTower', teamId: 'solar', type: 'spray', col: 4, row: 3 })
