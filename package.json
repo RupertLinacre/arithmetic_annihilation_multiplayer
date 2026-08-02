@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "maths-game-problem-generator": "^1.1.0",
+    "maths-game-problem-generator": "^1.2.0",
     "peerjs": "^1.5.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

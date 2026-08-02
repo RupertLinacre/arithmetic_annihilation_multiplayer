@@ -23,4 +23,16 @@ describe('reference maths question generation', () => {
     expect(question.choices).toContain(question.answer)
     expect(question.prompt.length).toBeGreaterThan(0)
   })
+
+  it('rotates through every problem type supported at the selected level', () => {
+    const generator = new MathsQuestionGenerator('all-problem-types')
+    const types = new Set(Array.from({ length: 6 }, () => generator.createQuestion('year2', 0).type))
+    expect(types).toEqual(new Set(['addition', 'subtraction', 'multiplication', 'division', 'squared', 'fraction']))
+  })
+
+  it('includes the new fraction problem type in the higher-level rotation', () => {
+    const generator = new MathsQuestionGenerator('fraction-problem-type')
+    const types = new Set(Array.from({ length: 7 }, () => generator.createQuestion('year5', 0).type))
+    expect(types).toEqual(new Set(['addition', 'subtraction', 'multiplication', 'division', 'squared', 'cube', 'fraction']))
+  })
 })

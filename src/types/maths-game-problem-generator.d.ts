@@ -9,12 +9,14 @@ declare module 'maths-game-problem-generator' {
   export interface GeneratedMathsProblem {
     expression: string
     expression_short: string
-    answer: number
+    answer: number | string
     formattedAnswer: string
     type: string
     yearLevel: string
     choices?: string[]
     correctChoice?: string
+    subtype?: string
+    expectedAnswer?: { kind: string; [key: string]: unknown }
   }
 
   export function generateProblem(options?: GenerateProblemOptions): GeneratedMathsProblem & {
@@ -22,4 +24,5 @@ declare module 'maths-game-problem-generator' {
     correctChoice: string
   }
   export function getYearLevels(): string[]
+  export function getProblemTypes(): string[]
 }

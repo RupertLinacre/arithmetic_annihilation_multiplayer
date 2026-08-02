@@ -1,4 +1,4 @@
-import { generateProblem, getYearLevels } from 'maths-game-problem-generator'
+import { generateProblem, getProblemTypes, getYearLevels } from 'maths-game-problem-generator'
 import type { MathsLevel, MathsQuestion } from './types'
 
 export const MATHS_LEVELS: { value: MathsLevel; label: string; note: string }[] = [
@@ -13,6 +13,7 @@ export const MATHS_LEVELS: { value: MathsLevel; label: string; note: string }[] 
 
 export const DEFAULT_MATHS_LEVEL: MathsLevel = 'year2'
 export const BASE_MATHS_DIFFICULTIES = getYearLevels() as readonly MathsLevel[]
+const SUPPORTED_PROBLEM_TYPES = getProblemTypes()
 
 const DIFFICULTY_OFFSETS = [0, 1, 2, 3] as const
 
@@ -56,16 +57,34 @@ class SeededRandom {
 export class MathsQuestionGenerator {
   private lastExpression: string | undefined
   private readonly rng: SeededRandom
+  private readonly problemTypes: string[]
+  private problemTypeIndex = 0
 
   constructor(seed: string) {
     this.rng = new SeededRandom(seed)
+    this.problemTypes = this.rng.shuffle(SUPPORTED_PROBLEM_TYPES)
+  }
+
+  /**
+   * Rotate through every problem type supported by the selected year level.
+   * The package falls back to addition for types unavailable at that level,
+   * so reject those fallbacks and continue until the next valid type.
+   */
+  private createPackageProblem(yearLevel: MathsLevel) {
+    for (let attempt = 0; attempt < this.problemTypes.length; attempt += 1) {
+      const type = this.problemTypes[this.problemTypeIndex % this.problemTypes.length]
+      this.problemTypeIndex += 1
+      const problem = generateProblem({ yearLevel, type, multipleChoice: true, choiceCount: 4 })
+      if (problem.type === type) return problem
+    }
+    return generateProblem({ yearLevel, multipleChoice: true, choiceCount: 4 })
   }
 
   createQuestion(baseLevel: MathsLevel = DEFAULT_MATHS_LEVEL, challenge = 0): MathsQuestion {
     const yearLevel = mapChallengeToYearLevel(baseLevel, challenge)
-    let problem = generateProblem({ yearLevel, multipleChoice: true, choiceCount: 4 })
+    let problem = this.createPackageProblem(yearLevel)
     for (let attempt = 0; attempt < 4 && problem.expression === this.lastExpression; attempt += 1) {
-      problem = generateProblem({ yearLevel, multipleChoice: true, choiceCount: 4 })
+      problem = this.createPackageProblem(yearLevel)
     }
     this.lastExpression = problem.expression
     return {
@@ -73,6 +92,7 @@ export class MathsQuestionGenerator {
       answer: problem.correctChoice,
       choices: this.rng.shuffle(problem.choices),
       levelLabel: MATHS_LEVELS.find((level) => level.value === yearLevel)?.label ?? yearLevel,
+      type: problem.type,
     }
   }
 }
