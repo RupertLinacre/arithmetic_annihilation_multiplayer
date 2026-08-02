@@ -32,9 +32,9 @@ describe('single-player combat balance', () => {
 
   it('increases monster health by fifteen percent of base health per spawner level', () => {
     expect(getMonsterHealthAtSpawnerLevel('brute', 1)).toBe(180)
-    expect(getMonsterHealthAtSpawnerLevel('brute', 2)).toBeCloseTo(207)
-    expect(getMonsterHealthAtSpawnerLevel('brute', 5)).toBeCloseTo(288)
-    expect(getMonsterHealthAtSpawnerLevel('brute', 16)).toBeCloseTo(585)
+    expect(getMonsterHealthAtSpawnerLevel('brute', 2)).toBeCloseTo(225)
+    expect(getMonsterHealthAtSpawnerLevel('brute', 5)).toBeCloseTo(360)
+    expect(getMonsterHealthAtSpawnerLevel('brute', 16)).toBeCloseTo(855)
   })
 
   it('matches the original maths progression for tower upgrades', () => {

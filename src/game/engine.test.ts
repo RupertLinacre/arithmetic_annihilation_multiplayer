@@ -36,8 +36,8 @@ describe('GameEngine', () => {
     const units = engine.snapshot().units
     expect(units[0].health).toBe(180)
     expect(units[0].maxHealth).toBe(180)
-    expect(units[1].health).toBe(585)
-    expect(units[1].maxHealth).toBe(585)
+    expect(units[1].health).toBe(855)
+    expect(units[1].maxHealth).toBe(855)
   })
 
   it('increases the opponent Nibble production after a wrong answer', () => {

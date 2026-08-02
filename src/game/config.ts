@@ -179,7 +179,7 @@ export const SPAWNER_RATE_MULTIPLIERS = [
 ] as const
 
 export const MAX_SPAWNER_LEVEL = SPAWNER_RATE_MULTIPLIERS.length
-export const MONSTER_HEALTH_INCREASE_PER_SPAWNER_LEVEL = .15
+export const MONSTER_HEALTH_INCREASE_PER_SPAWNER_LEVEL = .25
 
 export function getSpawnerRateMultiplier(level: number) {
   const clampedLevel = Math.max(1, Math.min(MAX_SPAWNER_LEVEL, level))
